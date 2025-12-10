@@ -3,7 +3,7 @@
 rvd -listen tcp:7500 -service 7500 -network ";239.1.1.10"
 ```
 
-### client app
+### server app
 ```
 using TIBCO.Rendezvous;
 
@@ -125,4 +125,42 @@ class DummyClient
     }
 }
 
+```
+
+
+### rvd.conf
+```
+[rvd]
+listen_port = 7500
+
+# ===========================
+# Service 0 – 기본 서비스
+# ===========================
+[service0]
+service_port = 7500
+multicast_group = 239.1.1.10
+multicast_port = 7500     # 보통 service_port와 동일
+
+# ===========================
+# Service 1
+# ===========================
+[service1]
+service_port = 7501
+multicast_group = 239.1.1.11
+multicast_port = 7501
+
+# ===========================
+# Service 2
+# ===========================
+[service2]
+service_port = 7502
+multicast_group = 239.1.1.12
+multicast_port = 7502
+
+```
+
+### rvd start
+```
+# rvd -config rvd.conf -nointeractive
+# rvd -f rvd.conf --readonly
 ```
