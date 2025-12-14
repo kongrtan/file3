@@ -1,0 +1,70 @@
+network:
+  ippoolType: none
+openpitrix:
+  s3:
+    endpoint: http://minio.kubesphere-system.svc:9000
+    region: us-east-1
+    disableSSL: true
+    forcePathStyle: true
+    accessKeyID: openpitrixminioaccesskey
+    secretAccessKey: openpitrixminiosecretkey
+    bucket: app-store
+monitoring:
+  endpoint: http://prometheus-operated.kubesphere-monitoring-system.svc:9090
+authentication:
+  authenticateRateLimiterMaxTries: 10
+  authenticateRateLimiterDuration: 10m0s
+  maximumClockSkew: 10s
+  loginHistoryRetentionPeriod: 168h0m0s
+  multipleLogin: true
+  jwtSecret: 0GIlMVNA65MCpn7KSMLHju04DYuDT73Z
+  # oauthOptions:
+  #   issuer: https://sso.k88s.store/realms/kubesphere
+  #   clients:
+  #   - name: kubesphere
+  #     secret: kubesphere
+  #     redirectURIs:
+  #     - '*'
+  #   accessTokenMaxAge: 0s
+  #   accessTokenInactivityTimeout: 0s
+  oauthOptions:
+    loginURL: "/oauth/token"
+    skipLocalAccount: false  
+    accessTokenMaxAge: 1h
+    accessTokenInactivityTimeout: 30m
+    identityProviders:
+    - name: keycloak                      # Provider 이름
+      type: OIDCIdentityProvider          # OIDC 타입
+      mappingMethod: auto
+      provider:
+        clientID: "kubesphere"
+        clientSecret: ""
+        issuer: "https://sso.k88s.store/realms/ks"
+        redirectURL: "https://ks.k88s.store/oauth/redirect/ks"
+        idTokenSkipVerify: true           # 필요 시 설정
+        scopes:
+        - openid
+        - email
+        - profile
+  kubectlImage: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/kubesphere/kubectl:v1.22.0
+multicluster:
+  enable: true
+  proxyPublishService: tower.kubesphere-system.svc
+  agentImage: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/kubesphere/tower:v0.2.0
+  clusterName: host
+  clusterRole: host
+notification:
+  endpoint: http://notification-manager-svc.kubesphere-monitoring-system.svc:19093
+gateway:
+  watchesPath: /var/helm-charts/watches.yaml
+  namespace: kubesphere-controls-system
+  repository: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/kubesphere/nginx-ingress-controller
+  tag: v1.1.0
+gpu:
+  kinds:
+  - resourceName: nvidia.com/gpu
+    resourceType: GPU
+    default: true
+terminal:
+  image: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/library/alpine:3.14
+  timeout: 600
