@@ -1,0 +1,45 @@
+@startuml
+autonumber
+
+actor Client
+participant "API-GW" as GW
+participant "API" as API
+participant "RVD" as RVD
+
+Client -> GW: HTTP Request
+activate GW
+
+group API-GW Token Validation
+    GW -> GW: validateToken()
+    alt Token Invalid
+        GW --> Client: 401 Unauthorized
+        deactivate GW
+    else Token Valid
+        GW -> API: Forward Request
+    end
+end
+
+activate API
+group API Parameter Validation
+    API -> API: validateParameters()
+    alt Invalid Parameter
+        API --> Client: 400 Bad Request
+        deactivate API
+    else Valid Parameter
+        API -> RVD: Publish Message
+        activate RVD
+
+        alt ACK within 3s
+            RVD --> API: ACK
+            deactivate RVD
+            API --> Client: 200 OK
+            deactivate API
+        else Timeout (3s)
+            deactivate RVD
+            API --> Client: 504 Gateway Timeout
+            deactivate API
+        end
+    end
+end
+
+@enduml
